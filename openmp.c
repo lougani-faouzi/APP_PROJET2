@@ -4,14 +4,40 @@
 
 /*Paralléliser avec OpenMP le calcul de la somme suivante*/
 #define max_iter_exo1 1000
+
 void exo1(){
-  int i;
-  int somme = 0;
-  for(i = 0; i < max_iter_exo1; i++){
-    somme += i; 
+         int somme = 0;
+         int rank,size;
+         //a pour but de recuperer le nombre de threads qui exécutent notre section parallèle
+         size=omp_get_num_threads();
+         //on recupere le rang 
+         rank=omp_get_thread_num();
+         int i;
+         
+#pragma omp parallel shared(somme,size)
+{ // les variables somme,size sont partagées pour tous les thread afin de permettre de calculer les sommes partielles simultanémement         
+         
+#pragma omp master
+  {// seul le thread maitre doit afficher le message (par définition il ya un seul tread maitre) 
+            printf("Je suis le maitre !\n");
   }
 
-  /*Vérification du résultat*/
+#pragma omp for private (i) reduction(+:somme) schedule(static) 
+ /* 
+  -Le compteur de boucle i est automatiquement privé à chaque thread.
+  -l'équilibrage de la charge de travail est asurée par :schedule(static).
+  -reduction :chaque i calcul un résultat partiel selon les plages d'iteration[0,250][250,500][500,750][750,1000] 
+  et synchronisent ensuite pour mettre à jour le résultat final.
+   */ 
+   for(i=rank*(max_iter_exo1/size);i<(rank*(max_iter_exo1/size))+(max_iter_exo1/size);i++)
+   {  
+	somme=somme+i;
+   }
+
+
+
+}
+/*Vérification du résultat*/
   fprintf(stderr,"Somme %d attendu %d\n",somme, ((max_iter_exo1-1)*max_iter_exo1)/2);
   assert(somme == ((max_iter_exo1-1)*max_iter_exo1)/2);
 }
@@ -49,7 +75,7 @@ int main(int argc, char** argv){
   fprintf(stderr,"OpenMP\n");
   
   exo1();
-  exo2();
+  //exo2();
   
   return 0; 
 }
