@@ -30,10 +30,9 @@ void exo1(){
   -reduction :chaque i calcul un résultat partiel selon les plages d'iteration[0,250][250,500][500,750][750,1000] 
   et synchronisent ensuite pour mettre à jour le résultat final.
    */ 
-   for(i=rank*(max_iter_exo1/size);i<(rank*(max_iter_exo1/size))+seuil;i++)
-   {  
-	somme=somme+i;
-   }
+   for(i=rank*(max_iter_exo1/size);i<(rank*(max_iter_exo1/size))+seuil;i++) 
+   somme=somme+i;
+   
 
 
 
