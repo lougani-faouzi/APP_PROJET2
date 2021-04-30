@@ -19,7 +19,7 @@ void exo1(){
 
    
   int i; 
-  int somme=0,s=0;
+  int somme=0,s=0,seuil;
   
   // recuperer le nombre de processus total
   MPI_Comm_size(MPI_COMM_WORLD, &size);
@@ -27,29 +27,28 @@ void exo1(){
   // recuperer le rang 
   MPI_Comm_rank(MPI_COMM_WORLD, &rank);
   
-  // si le rang recuperé n'est pas egale au rang du processus 0 
+  // si le rang recuperé n'est pas egale au rang du processus 0 (ROOT_RANK)
   if(rank!=ROOT_RANK)  
   {
        // on calcule la plage d'iteration 
+	seuil=max_iter_exo1/size;
   	plage_debut=rank*max_iter_exo1/size;
-  	plage_fin=(rank*max_iter_exo1/size)+max_iter_exo1/size; 
+  	plage_fin=(rank*max_iter_exo1/size)+seuil; 
        
-       //on calcule la somme pour le processus du rang rank 
-  	for(i=plage_debut;i<plage_fin;i++)
-  	{
-		s=s+i;
-        }
+        //on calcule la somme pour le processus du rang rank 
+        for(i=plage_debut;i<plage_fin;i++)
+        s=s+i;
         MPI_Reduce(&s, &somme, 1, MPI_INT, MPI_SUM, ROOT_RANK, MPI_COMM_WORLD);
   
   }else // si le rang recuperé est egale au rang du processus 0 
   {
+        
         // on fixe la plage d'iteration pour le processus root (processus 0)
-        plage_debut=0;
+      
         plage_fin=max_iter_exo1/size;
         //on calcule la somme pour le processus du rang 0 
-        for(i=plage_debut;i<plage_fin;i++){
-		s=s+i;
-        }
+        for(i=0;i<plage_fin;i++)
+        s=s+i;
         MPI_Reduce(&s, &somme, 1, MPI_INT, MPI_SUM, ROOT_RANK, MPI_COMM_WORLD);
   
   
