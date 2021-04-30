@@ -13,6 +13,7 @@ void exo1(){
          //on recupere le rang 
          rank=omp_get_thread_num();
          int i;
+         int seuil=max_iter_exo1/size;
          
 #pragma omp parallel shared(somme,size)
 { // les variables somme,size sont partagées pour tous les thread afin de permettre de calculer les sommes partielles simultanémement         
@@ -29,7 +30,7 @@ void exo1(){
   -reduction :chaque i calcul un résultat partiel selon les plages d'iteration[0,250][250,500][500,750][750,1000] 
   et synchronisent ensuite pour mettre à jour le résultat final.
    */ 
-   for(i=rank*(max_iter_exo1/size);i<(rank*(max_iter_exo1/size))+(max_iter_exo1/size);i++)
+   for(i=rank*(max_iter_exo1/size);i<(rank*(max_iter_exo1/size))+seuil;i++)
    {  
 	somme=somme+i;
    }
@@ -75,7 +76,7 @@ int main(int argc, char** argv){
   fprintf(stderr,"OpenMP\n");
   
   exo1();
-  //exo2();
+  exo2();
   
   return 0; 
 }
